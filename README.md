@@ -1,2 +1,2 @@
-# ResourcePackUtils
-An application containing some useful utilities for creating and maintaining Minecraft resource packs
+# DuplicateTextureFinder
+A tool to find duplicate textures between two resourcepacks 
