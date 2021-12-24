@@ -47,6 +47,9 @@ namespace TextureDuplicateChecker
 
         private void GetDuplicateTextures(string packPath1, string packPath2, string pack1Name = "Pack One", string pack2Name = "Pack Two")
         {
+            packOneNameTextbox.Text = pack1Name;
+            packTwoNameTextbox.Text = pack2Name;
+
             if (!ValidatePackPath(packPath1))
             {
                 outputTextBox.AppendText($"Invalid pack ({packPath1})\n");
@@ -58,9 +61,6 @@ namespace TextureDuplicateChecker
                 return;
             }
 
-            packOneNameTextbox.Text = pack1Name;
-            packTwoNameTextbox.Text = pack2Name;
-
             perfTimer.Restart();
             List<Texture> packOne = new List<Texture>();
             List<Texture> packTwo = new List<Texture>();
@@ -69,22 +69,16 @@ namespace TextureDuplicateChecker
             {
                 packOne = GetFileListFromPack(packPath1, pack1Name);
 
-                _ = Parallel.ForEach(packOne, (p) =>
-                {
-                    if (p != null)
-                        p.GetMD5();
-                });
+                foreach (Texture texture in packOne)
+                    texture.GetMD5();
             });
 
             Task packTwoTask = new Task(() =>
             {
                 packTwo = GetFileListFromPack(packPath2, pack2Name);
 
-                _ = Parallel.ForEach(packTwo, (p) =>
-                {
-                    if (p != null)
-                        p.GetMD5();
-                });
+                foreach (Texture texture in packOne)
+                    texture.GetMD5();
             });
 
             packOneTask.Start();
@@ -114,7 +108,8 @@ namespace TextureDuplicateChecker
             Task printingTask = new Task(() =>
             {
                 perfTimer.Restart();
-                _ = Parallel.ForEach(packOne, (p1Tex) =>
+                
+                foreach (Texture p1Tex in packOne)
                 {
                     try
                     {
@@ -129,7 +124,8 @@ namespace TextureDuplicateChecker
                         }
                     }
                     catch { } // Lazy solution
-                });
+                }
+
                 perfTimer.Stop();
                 this.BeginInvoke(new Action(() =>
                 {
@@ -167,7 +163,7 @@ namespace TextureDuplicateChecker
 
         private void exportButton_Click(object sender, EventArgs e)
         {
-            File.WriteAllText($"DuplicateTextures-{packOneNameTextbox.Text.Replace(" ", "_")}-{packTwoNameTextbox.Text.Replace(" ", "_")}.txt", $"Pack 1: {packOneNameTextbox.Text}\nPack 2: {packTwoNameTextbox.Text}\nDuplicate Textures: {duplicateCount.Text}\n\n{outputTextBox.Text}");
+            File.WriteAllText($"DuplicateTextures-{packOneNameTextbox.Text.Replace(" ", "_")}-{packTwoNameTextbox.Text.Replace(" ", "_")}.txt", $"WARNING! This tool should not be used for evidence alone.\nPlease verify the hashes of the duplicate files manually using a trusted tool to double check the results!\n\nPack 1: {packOneNameTextbox.Text}\nPack 2: {packTwoNameTextbox.Text}\nDuplicate Textures: {duplicateCount.Text}\n\n{outputTextBox.Text}");
         }
 
         private void packPath_TextChanged(object sender, EventArgs e)
