@@ -77,7 +77,7 @@ namespace TextureDuplicateChecker
             {
                 packTwo = GetFileListFromPack(packPath2, pack2Name);
 
-                foreach (Texture texture in packOne)
+                foreach (Texture texture in packTwo)
                     texture.GetMD5();
             });
 
